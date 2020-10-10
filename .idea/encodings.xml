@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/endoc/phtotapplication/CameraHandle.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/endoc/phtotapplication/FaceLibShow.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/endoc/phtotapplication/FaceRectView.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/endoc/phtotapplication/TTSBroadcast.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/facelibshow.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/gridview_item.xml" charset="GBK" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>
