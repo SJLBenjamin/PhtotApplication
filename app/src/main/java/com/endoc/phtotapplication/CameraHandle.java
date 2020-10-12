@@ -335,7 +335,6 @@ import static android.hardware.Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE;
             e.printStackTrace();
         }
 
-
         int ret = mFRAHandle.faceAddModel(libName, humId, humInfo, facePath, modelPath);
         if (ret != HikFRAAPI.FRA_RESUTL.FRA_RET_OK) {
             Log.e(TAG, "Add Face Model failed!!" + ret);

@@ -65,7 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Manifest.permission.CAMERA,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.MODIFY_AUDIO_SETTINGS
+            Manifest.permission.MODIFY_AUDIO_SETTINGS,
+            Manifest.permission.INTERNET
     };
 
     private byte[] IDmodelData = new byte[300];
@@ -130,8 +131,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mContex = this;
 
         allocPermission();
-       /* startActivity(new Intent(MainActivity.this,MyPhotoActivity.class));
-        finish();*/
+        //startActivity(new Intent(MainActivity.this,MyPhotoActivity.class));
+        //finish();
         mFaceRect = findViewById(R.id.faceRect);
         mSpeak = new TTSBroadcast(MainActivity.this);
 
@@ -197,7 +198,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         //设置旋转角度，角度错误会导致识别失败
                         mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_KEY_ROTATION, HikFRAAPI.ROTATION_ANGLE.ROTATION_270);
                         mCamHandle = new CameraHandle(mContex, mPrevSurface, mFRAProc, mFaceRect);
-
+                        File file = new File("/sdcard/facelib/");
+                        if(!file.exists()){
+                            file.mkdirs();
+                        }
                         //加载人脸数据库到缓冲区，即可实现1VN。
                         mFRAProc.loadFaceData(0, "/sdcard/facelib/", "/sdcard/facelib/database.bin", "facetest");
 
@@ -209,12 +213,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             }
             case R.id.capture:
-//                if (mCamHandle != null) {
-//                    mCamHandle.switchCamera();
-//                    break;
-//                }
-                int faceDelModel = mFRAProc.faceDelModel("facetest", "刘德华", "刘德华", "/sdcard/facelib/database.bin");
-                Log.e(TAG, "faceDelModel"+faceDelModel);
+                Intent intent1 = new Intent(MainActivity.this, MyPhotoActivity.class);
+                startActivity(intent1);
+/*                if (mCamHandle != null) {
+                    mCamHandle.switchCamera();
+                    break;
+                }*/
+//                int faceDelModel = mFRAProc.faceDelModel("facetest", "刘德华", "刘德华", "/sdcard/facelib/database.bin");
+//                Log.e(TAG, "faceDelModel"+faceDelModel);
                 break;
             case R.id.addface:
                 if (mCamHandle != null) {
