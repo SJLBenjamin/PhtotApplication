@@ -41,7 +41,7 @@ import static android.hardware.Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE;
     private SurfaceHolder mPreHolder = null;
     private ImageView mCapShow = null;
 
-    private int mCamerId = 0;
+    private int mCamerId = 1;//默认打开前置摄像头
     private Camera mCamera = null;
 
     private int mWidth = 640;
