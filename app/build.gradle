@@ -50,9 +50,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
+        debug{
+            signingConfig signingConfigs.debug
+        }
     }
-
 }
+
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -79,6 +82,25 @@ dependencies {
     //implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     /*//权限申请
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2'*/
+
+
+    //workManager
+    def work_version = "2.4.0"
+
+    // (Java only)
+    implementation "androidx.work:work-runtime:$work_version"
+
+    // Kotlin + coroutines
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+
+    // optional - RxJava2 support
+    implementation "androidx.work:work-rxjava2:$work_version"
+
+    // optional - GCMNetworkManager support
+    implementation "androidx.work:work-gcm:$work_version"
+
+    // optional - Test helpers
+    androidTestImplementation "androidx.work:work-testing:$work_version"
 
 
 }

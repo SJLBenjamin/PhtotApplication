@@ -17,4 +17,11 @@ public class IdList {
             return change;
         }
 
+    @Override
+    public String toString() {
+        return "IdList{" +
+                "id='" + id + '\'' +
+                ", change='" + change + '\'' +
+                '}';
+    }
 }

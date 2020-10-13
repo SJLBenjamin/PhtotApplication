@@ -7,8 +7,14 @@ import com.endoc.phtotapplication.network.api.FaceInterface;
 import com.google.gson.GsonBuilder;
 
 
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
-
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
@@ -26,8 +32,10 @@ public class RetrofitClient {
                     retrofit = new Retrofit.Builder().baseUrl(FaceApiURL)
                             .addConverterFactory(GsonConverterFactory.create())//将数据转换为Bean类的工具
                             .addConverterFactory(ScalarsConverterFactory.create())
-                            .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().create()))
+                            .addConverterFactory(new ToStringConverterFactory())
+                            //.addConverterFactory(GsonConverterFactory.create(new GsonBuilder().create()))
                             //.addCallAdapterFactory(RxJavaCallAdapterFactory.create())//支持RxJava
+
                             .build();
                 }
             }
@@ -41,10 +49,43 @@ public class RetrofitClient {
      *
      * @return
      */
-    public FaceInterface change() {
+    public FaceInterface faceInterface() {
         return createRetrofit().create(FaceInterface.class);
     }
 
+    /**
+     * 自定义转换器
+     */
+     class ToStringConverterFactory extends Converter.Factory {
+        private  final MediaType MEDIA_TYPE = MediaType.parse("text/plain");
+
+        @Override
+        public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
+            if (String.class.equals(type)) {
+                return new Converter<ResponseBody, String>() {
+                    @Override
+                    public String convert(ResponseBody value) throws IOException {
+                        return value.string();
+                    }
+                };
+            }
+            return null;
+        }
+
+        @Override
+        public Converter<?, RequestBody> requestBodyConverter(Type type, Annotation[] parameterAnnotations, Annotation[] methodAnnotations, Retrofit retrofit) {
+
+            if (String.class.equals(type)) {
+                return new Converter<String, RequestBody>() {
+                    @Override
+                    public RequestBody convert(String value) throws IOException {
+                        return RequestBody.create(MEDIA_TYPE, value);
+                    }
+                };
+            }
+            return null;
+        }
+    }
 
    /* private static OkHttpClient getOkHttpClient() {
         //日志显示级别

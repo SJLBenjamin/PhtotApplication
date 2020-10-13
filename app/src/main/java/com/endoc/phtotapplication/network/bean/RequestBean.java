@@ -61,6 +61,11 @@ public class RequestBean {
         private String personid;
         private String change;
 
+        public ReturnidBean(String personid, String change) {
+            this.personid = personid;
+            this.change = change;
+        }
+
         public String getPersonid() {
             return personid;
         }
