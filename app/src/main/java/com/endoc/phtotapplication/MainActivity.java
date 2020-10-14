@@ -28,6 +28,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.endoc.phtotapplication.activity.DeviceImfSetActivity;
+import com.endoc.phtotapplication.activity.UserDetailActivity;
+import com.endoc.phtotapplication.activity.VerifyActivity;
 import com.hikvision.face.HikFRAAPI;
 import java.io.File;
 import java.text.DecimalFormat;
@@ -132,6 +135,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         allocPermission();
         //startActivity(new Intent(MainActivity.this,MyPhotoActivity.class));
+        //startActivity(new Intent(MainActivity.this, UserDetailActivity.class));
+        startActivity(new Intent(MainActivity.this, VerifyActivity.class));
         //finish();
         mFaceRect = findViewById(R.id.faceRect);
         mSpeak = new TTSBroadcast(MainActivity.this);

@@ -22,7 +22,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".UserListActivity"/>
+        <activity android:name=".activity.VerifyActivity"></activity>
+        <activity android:name=".activity.UserManagerActivity" />
+        <activity android:name=".activity.UserDetailActivity" />
+        <activity android:name=".activity.DeviceImfSetActivity" />
+        <activity android:name=".UserListActivity" />
         <activity android:name=".MyPhotoActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

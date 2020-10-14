@@ -57,10 +57,10 @@ public class MyPhotoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //new WorkUtils().test();
-       /* if(true){
+        new WorkUtils().startTimer();
+        if(true){
             return;
-        }*/
+        }
         FaceInterface faceInterface = new RetrofitClient().faceInterface();
 
         //图片上传

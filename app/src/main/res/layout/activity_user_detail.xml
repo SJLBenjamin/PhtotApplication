@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F6F7FA"
+    tools:context=".activity.UserDetailActivity">
+
+
+    <!--沉浸式设置高度由沉浸式栏和自己想显示的高度组成,所以设置包裹两个布局的父布局高度为包裹内容-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rl_head"
+        android:layout_width="match_parent"
+        android:layout_height="161dp"
+        android:background="@drawable/head"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.endoc.phtotapplication.view.StatusBarHeightView
+            android:id="@+id/sbhv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="0dp"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:use_type="use_padding_top" />
+
+
+        <TextView
+            android:layout_marginTop="22.8dp"
+            android:id="@+id/tv_title_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="122345654"
+            android:textColor="#ffffffff"
+            android:textSize="19sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sbhv" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            app:layout_constraintTop_toTopOf="@id/tv_title_name"
+            android:src="@drawable/user_delect"
+            android:layout_marginRight="15dp"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="20dp"
+            android:layout_height="20dp"/>
+
+        <!-- <androidx.appcompat.widget.AppCompatImageView
+             android:visibility="gone"
+             android:id="@+id/iv_email"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+
+           />-->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <com.endoc.phtotapplication.view.StatusBarHeightView
+        android:visibility="invisible"
+        android:id="@+id/sbhv_invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="0dp"
+        android:orientation="vertical"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:use_type="use_padding_top" />
+
+    <TextView
+        android:visibility="invisible"
+        android:layout_marginTop="22.8dp"
+        android:id="@+id/tv_title_name_invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+
+        android:textColor="#ffffffff"
+        android:textSize="19sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sbhv_invisible" />
+
+    <LinearLayout
+        android:layout_marginTop="14dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="vertical"
+        android:background="@drawable/shape_card_list"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_title_name_invisible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal">
+
+            <TextView
+
+                style="@style/style_user_manager_text_device"
+                android:text="工号" />
+
+
+            <TextView
+                android:id="@+id/et_device_id"
+                style="@style/style_text_dump"/>
+
+
+        </LinearLayout>
+        <TextView style="@style/style_line" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal">
+
+            <TextView
+
+                style="@style/style_user_manager_text_device"
+                android:text="姓名" />
+
+            <TextView
+
+                android:text="123"
+                android:id="@+id/et_sq_bh"
+                style="@style/style_text_dump" />
+        </LinearLayout>
+        <TextView style="@style/style_line" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/style_user_manager_text_device"
+                android:text="卡片" />
+
+            <TextView
+                android:id="@+id/et_dd_id"
+                style="@style/style_text_dump" />
+        </LinearLayout>
+        <TextView style="@style/style_line" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/style_user_manager_text_device"
+                android:text="密码" />
+
+            <TextView
+                android:id="@+id/et_zl_tb"
+                style="@style/style_text_dump" />
+
+        </LinearLayout>
+        <TextView style="@style/style_line" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/style_user_manager_text_device"
+                android:text="人脸" />
+
+            <TextView
+                android:id="@+id/et_sq_id"
+                style="@style/style_text_dump" />
+        </LinearLayout>
+        <TextView style="@style/style_line" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal">
+
+            <TextView
+
+                style="@style/style_user_manager_text_device"
+                android:text="认证模式" />
+
+            <TextView
+                android:id="@+id/et_jl_dz"
+                style="@style/style_text_dump" />
+
+        </LinearLayout>
+        <TextView style="@style/style_line" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:orientation="horizontal">
+
+            <TextView
+
+                style="@style/style_user_manager_text_device"
+                android:text="用户类型" />
+
+            <TextView
+                android:id="@+id/et_tb_dz"
+                style="@style/style_text_dump" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
