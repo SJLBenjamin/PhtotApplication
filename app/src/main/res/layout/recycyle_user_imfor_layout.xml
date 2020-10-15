@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView
+        android:id="@+id/tv_name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14.5dp"
+        android:text="孟繁珺"
+        android:textColor="#ff222222"
+        android:textSize="16sp"
+        android:layout_marginLeft="14.5dp"
+        />
+
+
+    <TextView
+        android:layout_marginLeft="14.5dp"
+        android:layout_marginBottom="14.5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:id="@+id/tv_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="155"
+        android:textColor="#ff222222"
+        android:textSize="13sp"
+        />
+    <ImageView
+        android:src="@drawable/user_back1"
+        android:id="@+id/im_pht"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/im_dump"
+        android:layout_width="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_height="wrap_content"/>
+   <!-- <ImageView
+        android:src="@drawable/user_back1"
+        android:id="@+id/im_card"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="@id/im_dump"
+        android:layout_width="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_height="wrap_content"/>-->
+    <ImageView
+        android:src="@drawable/user_back1"
+        android:layout_marginRight="27dp"
+        android:id="@+id/im_dump"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
