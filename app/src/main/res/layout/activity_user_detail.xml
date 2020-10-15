@@ -112,7 +112,7 @@
 
 
             <TextView
-                android:id="@+id/et_device_id"
+                android:id="@+id/et_device_gh"
                 style="@style/style_text_dump"/>
 
 
@@ -131,11 +131,11 @@
             <TextView
 
                 android:text="123"
-                android:id="@+id/et_sq_bh"
+                android:id="@+id/et_sq_xm"
                 style="@style/style_text_dump" />
         </LinearLayout>
         <TextView style="@style/style_line" />
-        <LinearLayout
+   <!--     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:orientation="horizontal">
@@ -147,7 +147,7 @@
             <TextView
                 android:id="@+id/et_dd_id"
                 style="@style/style_text_dump" />
-        </LinearLayout>
+        </LinearLayout>-->
         <TextView style="@style/style_line" />
         <LinearLayout
             android:layout_width="match_parent"
@@ -159,7 +159,7 @@
                 android:text="密码" />
 
             <TextView
-                android:id="@+id/et_zl_tb"
+                android:id="@+id/et_zl_mm"
                 style="@style/style_text_dump" />
 
         </LinearLayout>
@@ -174,11 +174,12 @@
                 android:text="人脸" />
 
             <TextView
-                android:id="@+id/et_sq_id"
+                android:drawableRight="@drawable/user_back1"
+                android:id="@+id/et_sq_rl"
                 style="@style/style_text_dump" />
         </LinearLayout>
         <TextView style="@style/style_line" />
-        <LinearLayout
+    <!--    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:orientation="horizontal">
@@ -192,7 +193,7 @@
                 android:id="@+id/et_jl_dz"
                 style="@style/style_text_dump" />
 
-        </LinearLayout>
+        </LinearLayout>-->
         <TextView style="@style/style_line" />
         <LinearLayout
             android:layout_width="match_parent"
@@ -205,7 +206,7 @@
                 android:text="用户类型" />
 
             <TextView
-                android:id="@+id/et_tb_dz"
+                android:id="@+id/et_tb_yh"
                 style="@style/style_text_dump" />
         </LinearLayout>
 

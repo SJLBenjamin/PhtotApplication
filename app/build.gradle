@@ -102,5 +102,9 @@ dependencies {
     // optional - Test helpers
     androidTestImplementation "androidx.work:work-testing:$work_version"
 
+    //litepal
+    implementation 'org.litepal.guolindev:core:3.1.1'
 
+    //图片显示
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }

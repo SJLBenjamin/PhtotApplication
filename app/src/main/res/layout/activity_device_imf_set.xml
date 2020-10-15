@@ -108,7 +108,7 @@
 
         </LinearLayout>
 
-        <LinearLayout
+      <!--  <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:orientation="horizontal">
@@ -134,7 +134,7 @@
             <EditText
                 android:id="@+id/et_dd_id"
                 style="@style/style_edit" />
-        </LinearLayout>
+        </LinearLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"

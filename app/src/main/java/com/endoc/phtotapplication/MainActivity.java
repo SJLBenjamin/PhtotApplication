@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.OrientationEventListener;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
@@ -28,19 +29,25 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.endoc.phtotapplication.activity.BaseActivity;
 import com.endoc.phtotapplication.activity.DeviceImfSetActivity;
 import com.endoc.phtotapplication.activity.UserDetailActivity;
 import com.endoc.phtotapplication.activity.VerifyActivity;
+import com.endoc.phtotapplication.utils.StatusBarUtil;
+import com.endoc.phtotapplication.utils.StringUtils;
 import com.hikvision.face.HikFRAAPI;
+
+import org.litepal.LitePal;
+
 import java.io.File;
 import java.text.DecimalFormat;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity {
     private String TAG = "hikFRDemo";
     private CameraHandle mCamHandle = null;
     private SurfaceView mPrevSurface = null;
-    private HikFRAAPI mFRAProc = null;
+    private HikFRAAPI mFRAProc =  null;;
     private FRAListener mListener = null;
     //建模模型需要存放在sdcard根目录，当前位置在assets文件夹下
     private String mModelPath = "/sdcard/DFR_Model.bin";
@@ -92,6 +99,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 DecimalFormat df = new DecimalFormat("###.##");
                 mFaceId.setText(("人员：" + sArray[2] + "\n相似度：" + df.format(Float.parseFloat(sArray[0]) / 10) + "%"));
                 //Log.d(TAG, "1---------->>smilar:" + sArray[0] + " lib:" + sArray[1] + " humId:" + sArray[2] + " path:" + sArray[3]);
+                if(Float.parseFloat(sArray[0])>=90){//如果匹配度大于等于90
+                    //那么执行上传操作
+                    WorkUtils.getInstance().startUpLoad();
+                }
 
                 if (mLastFaceId != null && mLastFaceId.equals(sArray[2])) {
                     return;
@@ -131,13 +142,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        StatusBarUtil.setRootViewFitsSystemWindows(this, false);
+        //设置状态栏透明
+        StatusBarUtil.setTranslucentStatus(this);
+        //一般的手机的状态栏文字和图标都是白色的, 可如果你的应用也是纯白色的, 或导致状态栏文字看不清
+        //所以如果你是这种情况,请使用以下代码, 设置状态使用深色文字图标风格, 否则你可以选择性注释掉这个if内容
+        if (!StatusBarUtil.setStatusBarDarkTheme(this, true)) {
+            //如果不支持设置深色风格 为了兼容总不能让状态栏白白的看不清, 于是设置一个状态栏颜色为半透明,
+            //这样半透明+白=灰, 状态栏的文字能看得清
+            StatusBarUtil.setStatusBarColor(this, 0x55000000);
+            //StatusBarUtil.setStatusBarColor(this, Color.parseColor("#FFFFFF"));
+        }
         mContex = this;
 
         allocPermission();
         //startActivity(new Intent(MainActivity.this,MyPhotoActivity.class));
         //startActivity(new Intent(MainActivity.this, UserDetailActivity.class));
-        startActivity(new Intent(MainActivity.this, VerifyActivity.class));
+        //startActivity(new Intent(MainActivity.this, VerifyActivity.class));
         //finish();
+
+        //开启定时网络请求
+
         mFaceRect = findViewById(R.id.faceRect);
         mSpeak = new TTSBroadcast(MainActivity.this);
 
@@ -173,8 +198,114 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             Log.e(TAG, "Can't DetectOrientation");
         }
+        init();
+    }
+
+    @Override
+    public void initData() {
 
     }
+
+    @Override
+    public void initView() {
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startCamera();
+    }
+
+    public  void init(){
+        mPrevSurface = (SurfaceView) findViewById(R.id.surfaceView);
+        mFRAProc = new HikFRAAPI();
+        mListener = new FRAListener();
+        mFRAProc.setListener(mListener);
+
+        mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_KEY_FACE_MANAGE, "1");
+        //mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.HIK_FRA_KEY_NEED_FQFL, "1");
+        //mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.HIK_FRA_KEY_LIVE, "0.6");
+        //人脸缓冲区大小默认100000张；
+        mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_POOL_KEY_CAP, "10000");
+        //mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_KEY_MULTI_THREAD, "1");
+        //mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_KEY_EXT_RGB_BUFF, "1");
+        //初始化建模模型
+        int init = mFRAProc.init(640, 480, HikFRAAPI.YUV_FORMAT.YUV_NV21, mModelPath);
+        Log.i(TAG, "mFRAProc.init : "+init);
+        //设置旋转角度，角度错误会导致识别失败
+        mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_KEY_ROTATION, HikFRAAPI.ROTATION_ANGLE.ROTATION_270);
+        File file = new File(StringUtils.FilePath);
+        if(!file.exists()){
+            file.mkdirs();
+        }
+        //加载人脸数据库到缓冲区，即可实现1VN。
+        mFRAProc.loadFaceData(0, StringUtils.FilePath, "/sdcard/facelib/database.bin", "facetest");
+        //初始化数据库
+        LitePal.getDatabase();
+        WorkUtils.getInstance().startTimer(mFRAProc);
+    }
+
+    public void startCamera(){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                /*    Log.d(TAG, "start Camera preview!");
+                    mPrevSurface = (SurfaceView) findViewById(R.id.surfaceView);
+                    mFRAProc = new HikFRAAPI();
+                    mListener = new FRAListener();
+                    mFRAProc.setListener(mListener);
+
+                    mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_KEY_FACE_MANAGE, "1");
+                    //mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.HIK_FRA_KEY_NEED_FQFL, "1");
+                    //mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.HIK_FRA_KEY_LIVE, "0.6");
+                    //人脸缓冲区大小默认100000张；
+                    mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_POOL_KEY_CAP, "10000");
+                    //mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_KEY_MULTI_THREAD, "1");
+                    //mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_KEY_EXT_RGB_BUFF, "1");
+                    //初始化建模模型
+                    int init = mFRAProc.init(640, 480, HikFRAAPI.YUV_FORMAT.YUV_NV21, mModelPath);
+                    Log.i(TAG, "mFRAProc.init : "+init);
+                    //设置旋转角度，角度错误会导致识别失败
+                    mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_KEY_ROTATION, HikFRAAPI.ROTATION_ANGLE.ROTATION_270);*/
+                  //延迟后就不会出问题,所以说明必须surfaceView的holder View创建后才能去openCamera
+                    mPrevSurface.getHolder().addCallback(new SurfaceHolder.Callback() {
+                        @Override
+                        public void surfaceCreated(SurfaceHolder holder) {
+                            mCamHandle = new CameraHandle(mContex, mPrevSurface, mFRAProc, mFaceRect);
+
+                            //启动人脸算法
+                            mCamHandle.startProc();
+                            mPrevSurface.getHolder().removeCallback(this);//移除当前回调
+                        }
+
+                        @Override
+                        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+                        }
+
+                        @Override
+                        public void surfaceDestroyed(SurfaceHolder holder) {
+                          /*  mPrevSurface.getHolder().removeCallback(this);
+                            mCamera.setPreviewCallback(null);
+                            mCamera.stopPreview();
+                            mCamera.release();
+                            mCamera = null;*/
+                        }
+                    });
+
+
+                    //开始请求
+                    //new WorkUtils().startTimer(mFRAProc);
+
+                }
+            }).start();
+            //mStartBT.setClickable(false);
+
+    }
+
+
+
 
     @Override
     public void onClick(View v) {
@@ -203,15 +334,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         //设置旋转角度，角度错误会导致识别失败
                         mFRAProc.setParam(HikFRAAPI.FRA_SET_KEY.FRA_KEY_ROTATION, HikFRAAPI.ROTATION_ANGLE.ROTATION_270);
                         mCamHandle = new CameraHandle(mContex, mPrevSurface, mFRAProc, mFaceRect);
-                        File file = new File("/sdcard/facelib/");
+                        File file = new File(StringUtils.FilePath);
                         if(!file.exists()){
                             file.mkdirs();
                         }
                         //加载人脸数据库到缓冲区，即可实现1VN。
-                        mFRAProc.loadFaceData(0, "/sdcard/facelib/", "/sdcard/facelib/database.bin", "facetest");
+                        mFRAProc.loadFaceData(0, StringUtils.FilePath, "/sdcard/facelib/database.bin", "facetest");
 
                         //启动人脸算法
                         mCamHandle.startProc();
+                        //开始请求
+                       WorkUtils.getInstance().startTimer(mFRAProc);
                     }
                 }).start();
                 //mStartBT.setClickable(false);

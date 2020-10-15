@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,31 +43,12 @@ public class VerifyActivity extends BaseActivity {
     }
 
 
-    private EditText etSearch;
-    private RecyclerView rcUserList;
+
 
     @Override
     public void initView() {
 
 
-        etSearch = (EditText) findViewById(R.id.et_search);
-        rcUserList = (RecyclerView) findViewById(R.id.rc_user_list);
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //执行数据库查询操作
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
     }
 
     @Override
@@ -77,16 +59,36 @@ public class VerifyActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        verifySuccess();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d("1234","verifySuccess");
+                        verifySuccess(R.layout.recycyle_user_imfor_layout,findViewById(R.id.cl_root));
+                    }
+                });
+
+            }
+        }).start();
+
     }
 
-    public  void verifySuccess(){
+    public  void verifySuccess(int resource,View parent){
         PopupWindow popupBigPhoto = null;
-        View view = getLayoutInflater().inflate(R.layout.recycyle_user_imfor_layout, null);
+
+        //PopupWindow的布局
+        View view = getLayoutInflater().inflate(resource, null);
 
 
         if (popupBigPhoto == null) {
-            popupBigPhoto = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, true);
+            popupBigPhoto = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
             popupBigPhoto.setOutsideTouchable(true);
             popupBigPhoto.setOnDismissListener(new PopupWindow.OnDismissListener() {
                 @Override
@@ -98,7 +100,8 @@ public class VerifyActivity extends BaseActivity {
         if (popupBigPhoto.isShowing()) {
             popupBigPhoto.dismiss();
         } else {
-            popupBigPhoto.showAtLocation(findViewById(R.id.cl_root), Gravity.BOTTOM, 0, 0);
+            //findViewById(R.id.cl_root)  popupWindows需要显示的控件上
+            popupBigPhoto.showAtLocation(parent, Gravity.BOTTOM, 0, 0);
         }
 
     }

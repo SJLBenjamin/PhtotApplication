@@ -17,6 +17,7 @@ import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.endoc.phtotapplication.litepal.Person;
 import com.endoc.phtotapplication.network.api.FaceInterface;
 import com.endoc.phtotapplication.network.bean.ChangeResponseBean;
 import com.endoc.phtotapplication.network.bean.IdList;
@@ -25,6 +26,10 @@ import com.endoc.phtotapplication.network.bean.RequestBean;
 import com.endoc.phtotapplication.network.bean.ResultBean;
 import com.endoc.phtotapplication.network.bean.VerifyRequestBean;
 import com.endoc.phtotapplication.network.retrofit.RetrofitClient;
+import com.endoc.phtotapplication.utils.StringUtils;
+import com.hikvision.face.HikFRAAPI;
+
+import org.litepal.LitePal;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,6 +56,17 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class WorkUtils {
+   static WorkUtils workUtils =null;
+    public static WorkUtils getInstance(){
+        if(workUtils==null){
+            synchronized (WorkUtils.class){
+                if(workUtils==null){
+                    workUtils =new WorkUtils();
+                }
+            }
+        }
+        return workUtils;
+    }
     FaceInterface faceInterface = new RetrofitClient().faceInterface();
 
     /**
@@ -119,6 +135,17 @@ public class WorkUtils {
 
                             if(idList.get(i).getChange().equals("Delete")){//如果是删除操作
                                 //1.执行删除
+                                //本地删除
+                                List<Person> personList = LitePal.where("personID = ?", idList.get(i).getId()).find(Person.class);
+                                for(int j=0;j<personList.size();j++){
+                                    File file = new File(personList.get(j).getRepic());
+                                    file.delete();
+                                }
+
+
+                                //数据库删除
+                                LitePal.deleteAll(Person.class,"personID = ?",idList.get(i).getId());
+
                                 //2.告诉服务器删除成功
                                 requestPersonBean.setReqType("Return");//直接返回,所以修改为Return
                                 Call<ResultBean> addReturnBeanCall = faceInterface.addReturn(requestPersonBean);
@@ -142,14 +169,26 @@ public class WorkUtils {
                             //如果是Add或者是modify,那么就需要PersonId参数,即ReqType为Person的时候就需要这个id
                             requestPersonBean.setPersonId(idList.get(i).getId());
                             Call<PersonResponseBean> person = faceInterface.person(requestPersonBean);
-                            int finalI = i;
+
                             person.enqueue(new Callback<PersonResponseBean>() {
                                 @Override
                                 public void onResponse(Call<PersonResponseBean> call, Response<PersonResponseBean> response) {
                                     Log.d("MyPhotoActivity","person response=="+response.body().getCode());
                                     //Environment.getExternalStorageDirectory().getPath()
                                     //将图片储存到本地
-                                    base64ToFile(response.body().getPerson().getPicBase64(), "/sdcard/"+ finalI +".jpg");
+                                    base64ToFile(response.body().getPerson().getPicBase64(), StringUtils.FilePath+ response.body().getPerson().getId() +".jpg");
+
+                                    Person litpalPerson = new Person();
+                                    litpalPerson.setRetime(response.body().getPerson().getVdatetime());
+                                    litpalPerson.setName(response.body().getPerson().getName());
+                                    litpalPerson.setPersonID(response.body().getPerson().getId());
+                                    litpalPerson.setMembertype(response.body().getPerson().getMembertype());
+
+                                    //保存路径
+                                    litpalPerson.setRepic(StringUtils.FilePath+ response.body().getPerson().getId() +".jpg");
+                                    //如果有就更新,没有就保存
+                                    litpalPerson.saveOrUpdate("personID = ?",response.body().getPerson().getId());
+
 
                                     //本地数据存储成功之后,执行返回操作
                                     RequestBean addReturnBean = new RequestBean("192.168.100.200", "Return");
@@ -187,20 +226,11 @@ public class WorkUtils {
         }
     };
 
-
-    public void startTimer(){
+    HikFRAAPI mHikFRAAPI;
+    public void startTimer(HikFRAAPI hikFRAAPI){
+        mHikFRAAPI =hikFRAAPI;
         timer.schedule(task,0,60000);
     }
-
-
-
-
-
-
-
-
-
-
 
 
 

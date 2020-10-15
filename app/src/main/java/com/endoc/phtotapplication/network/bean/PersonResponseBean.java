@@ -47,6 +47,17 @@ public class PersonResponseBean {
         private String vdatetime;
         private String name;
         private String picBase64;
+        private String membertype;//人员类型
+
+        public String getMembertype() {
+            return membertype;
+        }
+
+        public void setMembertype(String membertype) {
+            this.membertype = membertype;
+        }
+
+
 
         public String getId() {
             return id;

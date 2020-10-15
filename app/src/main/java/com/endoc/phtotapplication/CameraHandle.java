@@ -205,6 +205,7 @@ import static android.hardware.Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE;
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             stopCamera();
+            //startCamera();
         }
 
         @Override

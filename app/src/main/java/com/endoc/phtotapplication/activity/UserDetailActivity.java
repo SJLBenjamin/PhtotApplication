@@ -2,13 +2,24 @@ package com.endoc.phtotapplication.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.endoc.phtotapplication.R;
+import com.endoc.phtotapplication.litepal.Person;
 import com.endoc.phtotapplication.utils.StatusBarUtil;
+import com.endoc.phtotapplication.utils.StringUtils;
+
+import org.litepal.LitePal;
+
+import java.util.List;
 
 public class UserDetailActivity extends BaseActivity {
+    String stringExtra;
+    List<Person> personList;
+    private Person mPerson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +36,10 @@ public class UserDetailActivity extends BaseActivity {
             StatusBarUtil.setStatusBarColor(this, 0x55000000);
             //StatusBarUtil.setStatusBarColor(this, Color.parseColor("#FFFFFF"));
         }
+         stringExtra = getIntent().getStringExtra(StringUtils.PersonID);
+        //人员详情
+        personList = LitePal.where("personID = ?", stringExtra).limit(1).find(Person.class);
+        mPerson = personList.get(0);
     }
 
     @Override
@@ -32,8 +47,33 @@ public class UserDetailActivity extends BaseActivity {
 
     }
 
+    private TextView etDeviceGh;
+    private TextView etSqXm;
+    private TextView etZlMm;
+    private TextView etSqRl;
+    private TextView etTbYh;
     @Override
     public void initView() {
+        etDeviceGh = (TextView) findViewById(R.id.et_device_gh);
+        etSqXm = (TextView) findViewById(R.id.et_sq_xm);
+        etZlMm = (TextView) findViewById(R.id.et_zl_mm);
+        etSqRl = (TextView) findViewById(R.id.et_sq_rl);
+        etTbYh = (TextView) findViewById(R.id.et_tb_yh);
+        etDeviceGh.setText(mPerson.getPersonID());
+        etSqXm.setText(mPerson.getName());
+        //密码未知
+        //etZlMm.setText();
+        //人脸
+        etSqRl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserDetailActivity.this, BigImageActivity.class);
+                intent.putExtra(StringUtils.bigImagePath,mPerson.getRepic());
+                startActivity(intent);
+            }
+        });
+        etTbYh.setText(mPerson.getMembertype().equals("0")?"内部人员":"临时访客");
+
 
     }
 
