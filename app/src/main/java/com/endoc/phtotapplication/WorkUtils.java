@@ -93,8 +93,8 @@ public class WorkUtils {
     }
 
 
-    Timer timer = new Timer();
-    TimerTask task = new TimerTask() {
+    Timer timer;
+    class MyTimerTask extends  TimerTask{
         @Override
         public void run() {
 
@@ -114,6 +114,141 @@ public class WorkUtils {
         });*/
         /*String base64 = imageToBase64("/sdcard/0.Jpeg");
         base64ToFile(base64,"/sdcard/test0.Jpeg");*/
+
+
+            RequestBean requestBean = new RequestBean("192.168.100.200", "Change");
+            Call<ChangeResponseBean> change = faceInterface.change(requestBean);
+            change.enqueue(new Callback<ChangeResponseBean>() {
+                @Override
+                public void onResponse(Call<ChangeResponseBean> call, Response<ChangeResponseBean> response) {
+                    Log.d("MyPhotoActivity","change onResponse=="+response.body().toString());
+                    List<IdList> idList = response.body().getIdList();
+                    if(idList.size()>0){//如果list有数据,那么进行详细数据请求操作
+
+                        RequestBean requestPersonBean = new RequestBean("192.168.100.200", "Person");
+                        for (int i=0;i<idList.size();i++){
+
+                            Log.d("MyPhotoActivity","type=="+idList.get(i).getChange());
+                            Log.d("MyPhotoActivity","idlist==="+idList.get(i).getId());
+                            //设置请求的类型
+                            requestPersonBean.setReturnid(new RequestBean.ReturnidBean(idList.get(i).getId(),idList.get(i).getChange()));
+
+                            if(idList.get(i).getChange().equals("Delete")){//如果是删除操作
+                                //1.执行删除
+                                //本地删除
+                                List<Person> personList = LitePal.where("personID = ?", idList.get(i).getId()).find(Person.class);
+                                for(int j=0;j<personList.size();j++){
+                                    File file = new File(personList.get(j).getRepic());
+                                    file.delete();
+                                }
+
+
+                                //数据库删除
+                                LitePal.deleteAll(Person.class,"personID = ?",idList.get(i).getId());
+
+                                //2.告诉服务器删除成功
+                                requestPersonBean.setReqType("Return");//直接返回,所以修改为Return
+                                Call<ResultBean> addReturnBeanCall = faceInterface.addReturn(requestPersonBean);
+                                addReturnBeanCall.enqueue(new Callback<ResultBean>() {
+                                    @Override
+                                    public void onResponse(Call<ResultBean> call, Response<ResultBean> response) {
+                                        Log.d("MyPhotoActivity","deleteReturnBeanCall response=="+response.body().getCode());
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<ResultBean> call, Throwable t) {
+                                        Log.d("MyPhotoActivity","deleteReturnBeanCall t=="+t.getMessage());
+                                    }
+                                });
+
+                                //3.然后终止此次循环
+                                continue;
+                            }
+
+
+                            //如果是Add或者是modify,那么就需要PersonId参数,即ReqType为Person的时候就需要这个id
+                            requestPersonBean.setPersonId(idList.get(i).getId());
+                            Call<PersonResponseBean> person = faceInterface.person(requestPersonBean);
+
+                            person.enqueue(new Callback<PersonResponseBean>() {
+                                @Override
+                                public void onResponse(Call<PersonResponseBean> call, Response<PersonResponseBean> response) {
+                                    Log.d("MyPhotoActivity","person response=="+response.body().getCode());
+                                    //Environment.getExternalStorageDirectory().getPath()
+                                    //将图片储存到本地
+                                    base64ToFile(response.body().getPerson().getPicBase64(), StringUtils.FilePath+ response.body().getPerson().getId() +".jpg");
+
+                                    Person litpalPerson = new Person();
+                                    litpalPerson.setRetime(response.body().getPerson().getVdatetime());
+                                    litpalPerson.setName(response.body().getPerson().getName());
+                                    litpalPerson.setPersonID(response.body().getPerson().getId());
+                                    litpalPerson.setMembertype(response.body().getPerson().getMembertype());
+
+                                    //保存路径
+                                    litpalPerson.setRepic(StringUtils.FilePath+ response.body().getPerson().getId() +".jpg");
+                                    //如果有就更新,没有就保存
+                                    litpalPerson.saveOrUpdate("personID = ?",response.body().getPerson().getId());
+
+                                    mHikFRAAPI.faceAddModel();
+
+
+                                    //本地数据存储成功之后,执行返回操作
+                                    RequestBean addReturnBean = new RequestBean("192.168.100.200", "Return");
+                                    addReturnBean.setReturnid(new RequestBean.ReturnidBean(response.body().getPerson().getId(),"Add"));
+                                    Call<ResultBean> addReturnBeanCall = faceInterface.addReturn(addReturnBean);
+                                    addReturnBeanCall.enqueue(new Callback<ResultBean>() {
+                                        @Override
+                                        public void onResponse(Call<ResultBean> call, Response<ResultBean> response) {
+                                            Log.d("MyPhotoActivity","addReturnBeanCall response=="+response.body().getCode());
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<ResultBean> call, Throwable t) {
+                                            Log.d("MyPhotoActivity","addReturnBeanCall t=="+t.getMessage());
+                                        }
+                                    });
+
+                                    //byte[] decode = Base64.decode(response.body().getPerson().getPicBase64().getBytes(), Base64.DEFAULT);
+                                }
+
+                                @Override
+                                public void onFailure(Call<PersonResponseBean> call, Throwable t) {
+                                    Log.d("MyPhotoActivity","person onFailure=="+t.getMessage());
+                                }
+                            });
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ChangeResponseBean> call, Throwable t) {
+                    Log.d("MyPhotoActivity","onFailure=="+t.getMessage());
+                }
+            });
+        }
+
+
+    }
+   /* TimerTask task = new TimerTask() {
+        @Override
+        public void run() {
+
+            //图片上传
+  *//*      SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Call<ResultBean> verify = faceInterface.verify(new VerifyRequestBean("216", "192.168.100.200", simpleDateFormat.format(new Date()), imageToBase64("/sdcard/0.Jpeg")));
+        verify.enqueue(new Callback<ResultBean>() {
+            @Override
+            public void onResponse(Call<ResultBean> call, Response<ResultBean> response) {
+                Log.d("MyPhotoActivity","verify onResponse=="+response.body().getCode());
+            }
+
+            @Override
+            public void onFailure(Call<ResultBean> call, Throwable t) {
+                Log.d("MyPhotoActivity","verify t=="+t.getMessage());
+            }
+        });*//*
+        *//*String base64 = imageToBase64("/sdcard/0.Jpeg");
+        base64ToFile(base64,"/sdcard/test0.Jpeg");*//*
 
 
             RequestBean requestBean = new RequestBean("192.168.100.200", "Change");
@@ -224,14 +359,20 @@ public class WorkUtils {
                 }
             });
         }
-    };
+    };*/
 
     HikFRAAPI mHikFRAAPI;
     public void startTimer(HikFRAAPI hikFRAAPI){
         mHikFRAAPI =hikFRAAPI;
-        timer.schedule(task,0,60000);
+        timer= new Timer();
+        timer.schedule(new MyTimerTask(),0,60000);
     }
 
+    public void stopTimer(){
+        timer.cancel();
+        timer=null;
+        mHikFRAAPI =null;
+    }
 
 
 

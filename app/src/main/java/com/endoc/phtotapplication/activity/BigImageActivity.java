@@ -32,7 +32,7 @@ public class BigImageActivity extends BaseActivity {
 
     @Override
     public void initData() {
-        findViewById(R.id.iv_back).setOnClickListener(this);
+        //findViewById(R.id.iv_back).setOnClickListener(this);
     }
 
     @Override
@@ -51,8 +51,8 @@ public class BigImageActivity extends BaseActivity {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.iv_back:
-                finish();
+           /* case R.id.iv_back:
+                finish();*/
             default:
                 break;
         }

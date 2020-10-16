@@ -47,5 +47,5 @@
         For example:
         <storage value="external" />
     -->
-    <storage value="face/facedata" />
+    <sdcard value="face/facedata" />
 </litepal>

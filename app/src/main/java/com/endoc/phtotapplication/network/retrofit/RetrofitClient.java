@@ -20,7 +20,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class RetrofitClient {
-    String FaceApiURL = "http://58.33.107.234:90/pfaceweb/";
+
+    //String FaceApiURL = "http://58.33.107.234:90/pfaceweb/";
+    String FaceApiURL = "http://58.33.107.234:1195/faceweb/";
     //String Base_url = "http://58.33.107.234:90/pfaceweb/";
     Retrofit retrofit;
 

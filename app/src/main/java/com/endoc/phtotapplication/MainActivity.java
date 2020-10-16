@@ -1,5 +1,6 @@
 package com.endoc.phtotapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -33,6 +34,7 @@ import com.endoc.phtotapplication.activity.BaseActivity;
 import com.endoc.phtotapplication.activity.DeviceImfSetActivity;
 import com.endoc.phtotapplication.activity.UserDetailActivity;
 import com.endoc.phtotapplication.activity.VerifyActivity;
+import com.endoc.phtotapplication.utils.Base64Utils;
 import com.endoc.phtotapplication.utils.StatusBarUtil;
 import com.endoc.phtotapplication.utils.StringUtils;
 import com.hikvision.face.HikFRAAPI;
@@ -99,10 +101,7 @@ public class MainActivity extends BaseActivity {
                 DecimalFormat df = new DecimalFormat("###.##");
                 mFaceId.setText(("人员：" + sArray[2] + "\n相似度：" + df.format(Float.parseFloat(sArray[0]) / 10) + "%"));
                 //Log.d(TAG, "1---------->>smilar:" + sArray[0] + " lib:" + sArray[1] + " humId:" + sArray[2] + " path:" + sArray[3]);
-                if(Float.parseFloat(sArray[0])>=90){//如果匹配度大于等于90
-                    //那么执行上传操作
-                    WorkUtils.getInstance().startUpLoad();
-                }
+
 
                 if (mLastFaceId != null && mLastFaceId.equals(sArray[2])) {
                     return;
@@ -122,6 +121,14 @@ public class MainActivity extends BaseActivity {
                     mFaceImg.setPivotY(mFaceImg.getHeight() / 2);
                     mFaceImg.setRotation((mDeviRotation == 0 ? 0 : (360 - mDeviRotation)));
                     mFaceImg.setImageDrawable(rdBm);
+
+                    if(Float.parseFloat(sArray[0])>=90){//如果匹配度大于等于90
+                        //那么执行上传操作
+                        Log.d(TAG,"开始上传");
+                        String bitmapToBase64 = Base64Utils.bitmapToBase64(rdBm.getBitmap());
+                        //此处应该通过名字查询数据库,再把id放进去
+                        WorkUtils.getInstance().startUpLoad(sArray[2],"192.168.100.200",bitmapToBase64);
+                    }
                 }
                 // Log.d(TAG, "2---------->>");
             } else if (msg.what == MSGCB_FR) {
@@ -214,7 +221,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        startCamera();
+       //allocCameraPermission();
+       startCamera();
     }
 
     public  void init(){
@@ -303,6 +311,7 @@ public class MainActivity extends BaseActivity {
             //mStartBT.setClickable(false);
 
     }
+
 
 
 
@@ -439,10 +448,44 @@ public class MainActivity extends BaseActivity {
     private void allocPermission() {
         //循环申请字符串数组里面的权限
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            //如果没有授权的权限就去请求权限
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, PERMISSIONS_ALLOC, 1);
             }
         }
+    }
+
+    private void allocCameraPermission() {
+        //循环申请字符串数组里面的权限
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            //如果没有授权的权限就去请求权限
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 2);
+            }
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode==1){
+            for(int i=0;i<permissions.length;i++){
+                if(grantResults[i]!=PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(mContext,permissions[i]+"权限被拒绝,程序自动退出",Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+        }else if(requestCode==2) {
+            startCamera();
+          /*  if(grantResults[0]!=PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(mContext,"相机权限被拒绝,程序自动退出",Toast.LENGTH_SHORT).show();
+                finish();
+            }else {
+                startCamera();
+            }*/
+        }
+
     }
 
     private class DeviceOrientationListion extends OrientationEventListener {
@@ -487,7 +530,10 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (mFRAProc!=null){
-            mFRAProc.deInit();}
+            mFRAProc.deInit();
+        }
+        WorkUtils.getInstance().stopTimer();
     }
+
 
 }

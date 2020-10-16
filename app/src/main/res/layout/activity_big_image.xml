@@ -5,14 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activity.caseedit.BigImageActivity">
-    <view.HeadView
-        android:id="@+id/rl_user_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:headTitleName="@string/look_big_image"
-        app:leftShow="true"
-        app:rightShow="false" />
+    tools:context=".activity.BigImageActivity">
+
 <ImageView
     android:layout_marginTop="13dp"
     android:layout_marginBottom="13dp"
